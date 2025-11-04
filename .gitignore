@@ -9,7 +9,7 @@ package-lock.json
 .env.zoho
 
 # Build output
-dist/
+# dist/ - Commented out to include compiled files in repo
 
 # Uploads and temporary files
 uploads/
