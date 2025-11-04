@@ -1,0 +1,465 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title OCR Passport Scanner - Test
+    style.
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        max-width: 600px;
+        width: 100%;
+        padding: 40px;
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 28px;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .upload-section {
+        border: 2px dashed #667eea;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        background: #f8f9ff;
+        margin-bottom: 20px;
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 15px 0;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      .upload-btn {
+        background: #667eea;
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .upload-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .file-name {
+        color: #666;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .scan-btn {
+        width: 100%;
+        background: #10b981;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .scan-btn:hover:not(:disabled) {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      }
+
+      .scan-btn:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .spinner {
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .result {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f0fdf4;
+        border: 2px solid #10b981;
+      }
+
+      .result.show {
+        display: block;
+      }
+
+      .result.error {
+        background: #fef2f2;
+        border-color: #ef4444;
+      }
+
+      .result-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #059669;
+      }
+
+      .result.error .result-title {
+        color: #dc2626;
+      }
+
+      .passenger-info {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .info-value {
+        color: #6b7280;
+      }
+
+      .validity-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 10px;
+      }
+
+      .validity-badge.valid {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .validity-badge.invalid {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .multiple-mode {
+        text-align: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .mode-label {
+        font-size: 14px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+  body
+    .container
+      h1 📄 Passport Scanner
+      .subtitle Test OCR Passport Scanning
+
+      .upload-section
+        .upload-icon 🛂
+        p Select passport image to scan
+        .file-input-wrapper
+          input#fileInput(type='file', accept='image/*')
+          button.upload-btn(onclick='document.getElementById("fileInput").click()') Choose File
+        .file-name#fileName No file selected
+
+        .multiple-mode
+          label.mode-label
+            input#multipleMode(type='checkbox')
+            span Scan multiple passports (up to 10)
+
+      button.scan-btn#scanBtn(disabled) Scan Passport
+
+      .loading#loading
+        .spinner
+        p Scanning passport...
+
+      .result#result
+
+    script.
+      const fileInput = document.getElementById('fileInput');
+      const fileName = document.getElementById('fileName');
+      const scanBtn = document.getElementById('scanBtn');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      const multipleMode = document.getElementById('multipleMode');
+
+      // Update file input to support multiple files
+      multipleMode.addEventListener('change', (e) => {
+        fileInput.multiple = e.target.checked;
+        fileInput.value = '';
+        fileName.textContent = 'No file selected';
+        scanBtn.disabled = true;
+        result.classList.remove('show');
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+          if (files.length === 1) {
+            fileName.textContent = files[0].name;
+          } else {
+            fileName.textContent = `${files.length} files selected`;
+          }
+          scanBtn.disabled = false;
+        } else {
+          fileName.textContent = 'No file selected';
+          scanBtn.disabled = true;
+        }
+        result.classList.remove('show');
+      });
+
+      scanBtn.addEventListener('click', async () => {
+        const files = fileInput.files;
+        if (files.length === 0) return;
+
+        loading.classList.add('show');
+        result.classList.remove('show');
+        scanBtn.disabled = true;
+
+        try {
+          const formData = new FormData();
+
+          if (multipleMode.checked) {
+            // Multiple files
+            for (let i = 0; i < files.length; i++) {
+              formData.append('files', files[i]);
+            }
+
+            const response = await fetch('/api/ocr/scan-passengers', {
+              method: 'POST',
+              body: formData
+            });
+
+            const data = await response.json();
+            displayMultipleResults(data);
+          } else {
+            // Single file
+            formData.append('file', files[0]);
+
+            const response = await fetch('/api/ocr/scan-passport', {
+              method: 'POST',
+              body: formData
+            });
+
+            const data = await response.json();
+            displayResult(data);
+          }
+        } catch (error) {
+          displayError(error.message);
+        } finally {
+          loading.classList.remove('show');
+          scanBtn.disabled = false;
+        }
+      });
+
+      function displayResult(data) {
+        result.classList.add('show');
+
+        if (!data.success) {
+          result.classList.add('error');
+          result.innerHTML = `
+            <div class="result-title">❌ Scanning Failed</div>
+            <p>${data.message || 'Unknown error occurred'}</p>
+          `;
+          return;
+        }
+
+        result.classList.remove('error');
+        const passenger = data.data.passenger;
+        const isValid = data.data.isValid;
+
+        result.innerHTML = `
+          <div class="result-title">✅ Passport Scanned Successfully</div>
+          <div class="passenger-info">
+            <div class="info-row">
+              <span class="info-label">👤 Name:</span>
+              <span class="info-value">${passenger.firstName} ${passenger.lastName}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📋 Passport:</span>
+              <span class="info-value">${passenger.passportNumber}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">🌍 Nationality:</span>
+              <span class="info-value">${passenger.nationality}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📅 Date of Birth:</span>
+              <span class="info-value">${passenger.dateOfBirth}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⚧ Gender:</span>
+              <span class="info-value">${passenger.gender}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📆 Expiry:</span>
+              <span class="info-value">${passenger.passportExpiry}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">🏛 Issued by:</span>
+              <span class="info-value">${passenger.passportIssueCountry}</span>
+            </div>
+          </div>
+          <span class="validity-badge ${isValid ? 'valid' : 'invalid'}">
+            ${isValid ? '✅ Passport Valid' : '⚠️ Passport Expired'}
+          </span>
+        `;
+      }
+
+      function displayMultipleResults(data) {
+        result.classList.add('show');
+
+        if (!data.success) {
+          result.classList.add('error');
+          result.innerHTML = `
+            <div class="result-title">❌ Scanning Failed</div>
+            <p>${data.message || 'Unknown error occurred'}</p>
+          `;
+          return;
+        }
+
+        result.classList.remove('error');
+        const passengers = data.data.passengers;
+
+        let html = `
+          <div class="result-title">✅ Scanned ${passengers.length} Passport(s)</div>
+        `;
+
+        passengers.forEach((item, index) => {
+          const passenger = item.passenger;
+          const isValid = item.isValid;
+
+          html += `
+            <div class="passenger-info" style="margin-top: 15px;">
+              <h4 style="margin-bottom: 10px; color: #374151;">Passenger ${index + 1}</h4>
+              <div class="info-row">
+                <span class="info-label">👤 Name:</span>
+                <span class="info-value">${passenger.firstName} ${passenger.lastName}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">📋 Passport:</span>
+                <span class="info-value">${passenger.passportNumber}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">🌍 Nationality:</span>
+                <span class="info-value">${passenger.nationality}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">📅 Date of Birth:</span>
+                <span class="info-value">${passenger.dateOfBirth}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">⚧ Gender:</span>
+                <span class="info-value">${passenger.gender}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">📆 Expiry:</span>
+                <span class="info-value">${passenger.passportExpiry}</span>
+              </div>
+              <span class="validity-badge ${isValid ? 'valid' : 'invalid'}">
+                ${isValid ? '✅ Valid' : '⚠️ Expired'}
+              </span>
+            </div>
+          `;
+        });
+
+        result.innerHTML = html;
+      }
+
+      function displayError(message) {
+        result.classList.add('show', 'error');
+        result.innerHTML = `
+          <div class="result-title">❌ Error</div>
+          <p>${message}</p>
+        `;
+      }

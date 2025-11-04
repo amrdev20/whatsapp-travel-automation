@@ -1,0 +1,671 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Offto - Travel Sales Chat
+    style.
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #343541;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .chat-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        background: #343541;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .chat-header {
+        background: #202123;
+        color: #ffffff;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #3e3e40;
+        flex-shrink: 0;
+      }
+      .header-info h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+      }
+      .header-info span {
+        font-size: 12px;
+        color: #9b9b9f;
+        margin-top: 2px;
+        display: block;
+      }
+      .header-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .btn-reset, .btn-logout {
+        padding: 6px 12px;
+        background: transparent;
+        border: 1px solid #565869;
+        color: #ececf1;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-reset:hover, .btn-logout:hover {
+        background: #40414f;
+        border-color: #8e8ea0;
+      }
+      @media (min-width: 768px) {
+        .chat-container {
+          width: 90%;
+          max-width: 950px;
+          height: 90vh;
+          max-height: 900px;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .chat-header {
+          padding: 20px 24px;
+        }
+        .header-info h2 {
+          font-size: 20px;
+        }
+        .header-info span {
+          font-size: 13px;
+          margin-top: 4px;
+        }
+        .header-actions {
+          gap: 10px;
+        }
+        .btn-reset, .btn-logout {
+          padding: 8px 16px;
+          font-size: 13px;
+        }
+      }
+      .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #343541;
+        -webkit-overflow-scrolling: touch;
+      }
+      .messages-container::-webkit-scrollbar {
+        width: 4px;
+      }
+      .messages-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .messages-container::-webkit-scrollbar-thumb {
+        background: #565869;
+        border-radius: 4px;
+      }
+      .messages-container::-webkit-scrollbar-thumb:hover {
+        background: #8e8ea0;
+      }
+      .empty-state {
+        text-align: center;
+        margin-top: 40px;
+        color: #ececf1;
+        padding: 0 20px;
+      }
+      .empty-state h3 {
+        margin-bottom: 8px;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+      }
+      .empty-state p {
+        color: #9b9b9f;
+        font-size: 14px;
+      }
+      .message {
+        display: flex;
+        animation: slideIn 0.2s ease-out;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .message.user {
+        justify-content: flex-end;
+      }
+      .message.assistant {
+        justify-content: flex-start;
+      }
+      .message-content {
+        max-width: calc(100% - 40px);
+        padding: 10px 14px;
+        border-radius: 12px;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+        line-height: 1.5;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      .message.user .message-content {
+        background: #10a37f;
+        color: #ffffff;
+        border-bottom-right-radius: 4px;
+      }
+      .message.assistant .message-content {
+        background: #444654;
+        color: #ececf1;
+        border-bottom-left-radius: 4px;
+      }
+      @media (min-width: 768px) {
+        .messages-container {
+          padding: 20px;
+          gap: 16px;
+        }
+        .messages-container::-webkit-scrollbar {
+          width: 8px;
+        }
+        .empty-state {
+          margin-top: 80px;
+        }
+        .empty-state h3 {
+          font-size: 28px;
+          margin-bottom: 12px;
+        }
+        .empty-state p {
+          font-size: 15px;
+        }
+        .message-content {
+          max-width: 75%;
+          padding: 14px 18px;
+          line-height: 1.6;
+          font-size: 15px;
+        }
+      }
+      .input-container {
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        background: #40414f;
+        border-top: 1px solid #565869;
+        flex-shrink: 0;
+      }
+      .input-container input {
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 16px;
+        background: #40414f;
+        color: #ececf1;
+        border: 1px solid #565869;
+        border-radius: 12px;
+        outline: none;
+        transition: all 0.2s;
+      }
+      .input-container input::placeholder {
+        color: #8e8ea0;
+      }
+      .input-container input:focus {
+        border-color: #8e8ea0;
+        background: #40414f;
+      }
+      .input-container input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-upload {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: #565869;
+        color: #ffffff;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .btn-upload:hover:not(:disabled) {
+        background: #666779;
+      }
+      .btn-upload:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      .btn-send {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: #10a37f;
+        color: #ffffff;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .btn-send:hover:not(:disabled) {
+        background: #0e9170;
+      }
+      .btn-send:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background: #565869;
+      }
+      #file-input {
+        display: none;
+      }
+      @media (min-width: 768px) {
+        .input-container {
+          gap: 12px;
+          padding: 20px 24px;
+        }
+        .input-container input {
+          padding: 14px 18px;
+          font-size: 15px;
+        }
+        .btn-upload {
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+        }
+        .btn-send {
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+        }
+      }
+      .typing-indicator {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background: #9b9b9f;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+      }
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes typing {
+        0%, 60%, 100% {
+          transform: translateY(0);
+          opacity: 0.4;
+        }
+        30% {
+          transform: translateY(-8px);
+          opacity: 1;
+        }
+      }
+      .login-container {
+        background: #343541;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 400px;
+      }
+      .login-container h2 {
+        color: #ececf1;
+        margin-bottom: 24px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      .login-container input {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1px solid #565869;
+        border-radius: 12px;
+        font-size: 16px;
+        margin-bottom: 16px;
+        outline: none;
+        background: #40414f;
+        color: #ececf1;
+        transition: all 0.2s;
+      }
+      .login-container input::placeholder {
+        color: #8e8ea0;
+      }
+      .login-container input:focus {
+        border-color: #8e8ea0;
+        background: #40414f;
+      }
+      .login-container button {
+        width: 100%;
+        padding: 14px;
+        background: #10a37f;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .login-container button:hover {
+        background: #0e9170;
+      }
+      @media (min-width: 768px) {
+        .login-container {
+          padding: 40px;
+        }
+        .login-container h2 {
+          margin-bottom: 30px;
+          font-size: 24px;
+        }
+        .login-container input {
+          font-size: 15px;
+          margin-bottom: 20px;
+        }
+        .login-container button {
+          font-size: 15px;
+        }
+      }
+  body
+    #app
+      .login-container#login-view
+        h2 Welcome to Offto
+        input#phone-input(type="tel" placeholder="Enter your phone number" required)
+        button#login-btn Login
+
+      .chat-container#chat-view(style="display: none;")
+        .chat-header
+          .header-info
+            h2 Offto
+            span#phone-display
+          .header-actions
+            button.btn-reset#reset-btn Reset
+            button.btn-logout#logout-btn Logout
+
+        .messages-container#messages
+          .empty-state
+            h3 Welcome to Offto
+            p Start by telling me where you'd like to travel!
+
+        form.input-container#message-form
+          input#file-input(type="file" accept="image/*")
+          button.btn-upload(type="button" onclick="document.getElementById('file-input').click()") 📎
+          input#message-input(type="text" placeholder="Type your message..." autocomplete="off")
+          button.btn-send(type="submit") ➤
+
+    script.
+      let currentPhone = '';
+      let messages = [];
+      let loading = false;
+
+      const loginView = document.getElementById('login-view');
+      const chatView = document.getElementById('chat-view');
+      const phoneInput = document.getElementById('phone-input');
+      const loginBtn = document.getElementById('login-btn');
+      const phoneDisplay = document.getElementById('phone-display');
+      const messagesContainer = document.getElementById('messages');
+      const messageForm = document.getElementById('message-form');
+      const messageInput = document.getElementById('message-input');
+      const resetBtn = document.getElementById('reset-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      const fileInput = document.getElementById('file-input');
+
+      // Handle file upload (passport scanning)
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file || loading) return;
+
+        loading = true;
+        messages.push({ role: 'user', content: `📄 Uploading passport: ${file.name}` });
+        renderMessages();
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/ocr/scan-passport', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            const passenger = data.data.passenger;
+            const isValid = data.data.isValid;
+
+            let message = `✅ Passport scanned successfully!\n\n`;
+            message += `👤 Name: ${passenger.firstName} ${passenger.lastName}\n`;
+            message += `📋 Passport: ${passenger.passportNumber}\n`;
+            message += `🌍 Nationality: ${passenger.nationality}\n`;
+            message += `📅 Date of Birth: ${passenger.dateOfBirth}\n`;
+            message += `⚧ Gender: ${passenger.gender}\n`;
+            message += `📆 Expiry: ${passenger.passportExpiry}\n`;
+            message += `🏛 Issued by: ${passenger.passportIssueCountry}\n\n`;
+            message += isValid ? '✅ Passport is valid' : '⚠️ Passport is expired!';
+
+            messages.push({ role: 'assistant', content: message });
+
+            // Send passport data to backend to update context
+            try {
+              // First, save passport data silently
+              await fetch('/api/v4/chat/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  phone: currentPhone,
+                  message: `[SYSTEM] Passport uploaded and scanned`,
+                  passportData: passenger
+                })
+              });
+
+              // Then send user message about using passport
+              const userMessage = `Please use the passport data I just uploaded for the booking. The passport belongs to ${passenger.firstName} ${passenger.lastName}.`;
+              messages.push({ role: 'user', content: userMessage });
+              loading = true;
+              renderMessages();
+
+              const aiResponse = await fetch('/api/v4/chat/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  phone: currentPhone,
+                  message: userMessage
+                })
+              });
+
+              const aiData = await aiResponse.json();
+              if (aiData.success && aiData.message) {
+                messages.push({ role: 'assistant', content: aiData.message });
+              }
+
+              console.log('Passport data saved and AI notified');
+            } catch (err) {
+              console.error('Failed to save passport to context:', err);
+              messages.push({ role: 'assistant', content: '❌ Failed to save passport data. Please try again.' });
+            }
+          } else {
+            messages.push({ role: 'assistant', content: '❌ Failed to scan passport. Please try again with a clearer image.' });
+          }
+        } catch (error) {
+          console.error('Error scanning passport:', error);
+          messages.push({ role: 'assistant', content: '❌ Error scanning passport. Please try again.' });
+        } finally {
+          loading = false;
+          fileInput.value = '';
+          renderMessages();
+        }
+      });
+
+      // Login
+      loginBtn.addEventListener('click', () => {
+        const phone = phoneInput.value.trim();
+        if (phone) {
+          currentPhone = phone;
+          phoneDisplay.textContent = phone;
+          loginView.style.display = 'none';
+          chatView.style.display = 'flex';
+          loadHistory();
+        }
+      });
+
+      phoneInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          loginBtn.click();
+        }
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        currentPhone = '';
+        messages = [];
+        phoneInput.value = '';
+        loginView.style.display = 'block';
+        chatView.style.display = 'none';
+        renderMessages();
+      });
+
+      // Reset
+      resetBtn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to reset the conversation?')) {
+          try {
+            const response = await fetch('/api/v4/chat/reset', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ phone: currentPhone })
+            });
+            const data = await response.json();
+            if (data.success) {
+              messages = [];
+              renderMessages();
+              alert('Conversation reset successfully!');
+            }
+          } catch (error) {
+            console.error('Error resetting:', error);
+            alert('Error resetting conversation');
+          }
+        }
+      });
+
+      // Load history
+      async function loadHistory() {
+        try {
+          const response = await fetch(`/api/v4/chat/history/${currentPhone}`);
+          const data = await response.json();
+          if (data.success && data.messages) {
+            messages = data.messages;
+            renderMessages();
+          }
+        } catch (error) {
+          console.error('Error loading history:', error);
+        }
+      }
+
+      // Send message
+      messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message || loading) return;
+
+        messages.push({ role: 'user', content: message });
+        messageInput.value = '';
+        loading = true;
+        renderMessages();
+
+        try {
+          const response = await fetch('/api/v4/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: currentPhone, message })
+          });
+          const data = await response.json();
+
+          if (data.success) {
+            messages.push({ role: 'assistant', content: data.message });
+          } else {
+            messages.push({ role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' });
+          }
+        } catch (error) {
+          console.error('Error sending message:', error);
+          messages.push({ role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' });
+        } finally {
+          loading = false;
+          renderMessages();
+        }
+      });
+
+      // Render messages
+      function renderMessages() {
+        if (messages.length === 0) {
+          messagesContainer.innerHTML = `
+            <div class="empty-state">
+              <h3>Welcome to Offto</h3>
+              <p>Start by telling me where you'd like to travel!</p>
+            </div>
+          `;
+          return;
+        }
+
+        messagesContainer.innerHTML = messages.map(msg => `
+          <div class="message ${msg.role}">
+            <div class="message-content">${escapeHtml(msg.content)}</div>
+          </div>
+        `).join('');
+
+        if (loading) {
+          messagesContainer.innerHTML += `
+            <div class="message assistant">
+              <div class="message-content">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p style="font-size: 0.9em; color: #666; margin-top: 8px;">AI is processing your request...</p>
+              </div>
+            </div>
+          `;
+        }
+
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
