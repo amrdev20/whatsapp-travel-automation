@@ -3,6 +3,7 @@ import { whatsappService } from '../services/whatsapp.service';
 import { ChatController } from './chat.controller';
 import { ChatSalesController } from './chat-sales.controller';
 import sessionService from '../services/session.service';
+import { zohoSalesIQService } from '../services/zoho-salesiq.service';
 import axios from 'axios';
 import FormData from 'form-data';
 import * as fs from 'fs';
@@ -143,6 +144,13 @@ export class WhatsAppController {
       console.log('Processing WhatsApp message:', data);
 
       try {
+        // Track customer message in Zoho SalesIQ
+        await zohoSalesIQService.trackWhatsAppMessage(
+          data.from,
+          data.contactName || `WhatsApp User ${data.from}`,
+          data.text
+        );
+
         // Format the message for our chat system
         const chatRequest = {
           phone: data.from,
@@ -163,10 +171,15 @@ export class WhatsAppController {
             if (response.success && response.message) {
               await whatsappService.sendMessage(data.from, response.message);
 
+              // Track bot response in Zoho SalesIQ
+              await zohoSalesIQService.trackBotResponse(data.from, response.message);
+
               // If there's a payment link, send it as a follow-up
               if (response.paymentLink) {
                 const paymentMessage = `رابط الدفع / Payment Link:\n${response.paymentLink}`;
                 await whatsappService.sendMessage(data.from, paymentMessage);
+                // Track payment link in Zoho
+                await zohoSalesIQService.trackBotResponse(data.from, paymentMessage);
               }
             }
           },
