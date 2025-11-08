@@ -102,16 +102,18 @@ class ZohoSalesIQService {
       // If no conversation exists, create one
       if (!conversationId) {
         console.log(`🔍 No conversation found for ${phoneNumber}, creating new one`);
-        conversationId = await this.createConversation(
+        const newConversationId = await this.createConversation(
           phoneNumber,
           `WhatsApp User ${phoneNumber}`,
           message
         );
 
-        if (!conversationId) {
+        if (!newConversationId) {
           console.error('❌ Failed to create conversation');
           return false;
         }
+
+        conversationId = newConversationId;
 
         // First message was already sent during conversation creation
         if (isFromCustomer) {
