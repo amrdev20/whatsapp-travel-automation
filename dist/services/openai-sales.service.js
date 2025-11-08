@@ -652,17 +652,34 @@ ${passports.map((passport, index) => `
 - Issuing Country: ${passport.passportIssueCountry}
 `).join('\n')}
 
-⚠️ **DATA NOT ON PASSPORT - YOU MUST ASK USER FOR THESE:**
-- Email Address (passports don't have email - ASK the user)
-- Mobile Phone Number with country code (passports don't have phone - ASK the user)
+🚨 **CRITICAL - EMAIL AND PHONE ARE NOT ON PASSPORTS - NEVER GENERATE THEM** 🚨
+
+⚠️ **YOU MUST STOP AND ASK USER FOR:**
+1. **Email Address** - Passports don't contain email addresses
+2. **Mobile Phone Number** - Passports don't contain phone numbers
+
+**🚫 ABSOLUTELY FORBIDDEN:**
+❌ DO NOT create email from passport name (e.g., sarah.martin@example.com)
+❌ DO NOT make up or guess email addresses
+❌ DO NOT auto-generate phone numbers
+❌ DO NOT assume any contact information
+❌ DO NOT use example.com or any placeholder emails
+❌ DO NOT proceed without EXPLICITLY asking the user to provide their real email and phone
+
+**✅ WHAT YOU MUST DO:**
+After receiving all passports, you MUST explicitly ask:
+"I have received all passport information. Now I need your contact details:
+1. What is your email address?
+2. What is your mobile phone number with country code?"
 
 **CRITICAL BOOKING INSTRUCTIONS:**
 
 1. **For holderData (contact/billing info):**
-   - email: ❌ NOT ON PASSPORT - MUST ASK USER
-   - mobileNumber: ❌ NOT ON PASSPORT - MUST ASK USER
-   - codePhoneId: ❌ NOT ON PASSPORT - MUST ASK USER (country code)
+   - email: ❌ NOT ON PASSPORT - MUST EXPLICITLY ASK USER FOR REAL EMAIL
+   - mobileNumber: ❌ NOT ON PASSPORT - MUST EXPLICITLY ASK USER FOR REAL PHONE
+   - codePhoneId: ❌ NOT ON PASSPORT - MUST EXPLICITLY ASK USER FOR COUNTRY CODE
    - Can use first passenger's name for contact if user doesn't provide different name
+   - **NEVER CREATE PLACEHOLDER EMAILS OR PHONES**
 
 2. **For paxes array - YOU MUST CREATE ${adultsCount} PASSENGER OBJECTS:**
 ${passports.map((passport, index) => `   Passenger ${index + 1}:
@@ -681,9 +698,13 @@ ${passports.map((passport, index) => `   Passenger ${index + 1}:
    - "1. Email address"
    - "2. Mobile phone number with country code"
 
-4. **DO NOT:**
+4. **🚫 ABSOLUTELY FORBIDDEN - DO NOT:**
    - ❌ Ask for passenger names again (you have them from passports)
-   - ❌ Construct email from passport names
+   - ❌ Construct email from passport names (e.g., sarah.martin@example.com)
+   - ❌ Generate or guess ANY email addresses
+   - ❌ Use example.com or any placeholder domains
+   - ❌ Create or assume phone numbers
+   - ❌ Proceed with booking without REAL user-provided email and phone
    - ❌ Create fewer paxes than adultsCount
 
 5. **ALL passenger data MUST be in ENGLISH and match passport exactly**
